@@ -19,11 +19,11 @@ import satisfy.beachparty.registry.ObjectRegistry;
 
 public class VillagersFabric {
 
-    private static final BeachpartyIdentifier BEACH_GUY_POI_IDENTIFIER = new BeachpartyIdentifier("beach_guy_poi");
+    private static final ResourceLocation BEACH_GUY_POI_IDENTIFIER = BeachpartyIdentifier.of("beach_guy_poi");
     public static final PoiType BEACH_GUY_POI = PointOfInterestHelper.register(BEACH_GUY_POI_IDENTIFIER, 1, 12, ObjectRegistry.LOUNGE_CHAIR.get());
     public static final VillagerProfession BEACH_GUY = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, new ResourceLocation("beachparty", "beach_guy"), VillagerProfessionBuilder.create().id(new ResourceLocation("beachparty", "beach_guy")).workstation(ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, BEACH_GUY_POI_IDENTIFIER)).build());
 
-    private static final BeachpartyIdentifier BARKEEPER_POI_IDENTIFIER = new BeachpartyIdentifier("barkeeper_poi");
+    private static final ResourceLocation BARKEEPER_POI_IDENTIFIER = BeachpartyIdentifier.of("barkeeper_poi");
     public static final PoiType BARKEEPER_POI = PointOfInterestHelper.register(BARKEEPER_POI_IDENTIFIER, 1, 12, ObjectRegistry.TIKI_BAR.get());
     public static final VillagerProfession BARKEEPER = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, new ResourceLocation("beachparty", "barkeeper"), VillagerProfessionBuilder.create().id(new ResourceLocation("beachparty", "barkeeper")).workstation(ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, BARKEEPER_POI_IDENTIFIER)).build());
 
@@ -46,7 +46,7 @@ public class VillagersFabric {
                 factories.add(new VillagerUtil.BuyForOneEmeraldFactory(Items.POWDER_SNOW_BUCKET, 12, 1, 5));
         });
 
-        VillagerType.BY_BIOME.put(ResourceKey.create(Registries.BIOME, new ResourceLocation("beach")), BEACH);
+        VillagerType.BY_BIOME.put(ResourceKey.create(Registries.BIOME, ResourceLocation.withDefaultNamespace("beach")), BEACH);
 
     }
 }

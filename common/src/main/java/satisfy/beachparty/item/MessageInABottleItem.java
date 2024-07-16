@@ -1,6 +1,8 @@
 package satisfy.beachparty.item;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.StructureTags;
@@ -18,6 +20,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
+import net.minecraft.world.level.saveddata.maps.MapDecorationType;
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,23 +84,23 @@ public class MessageInABottleItem extends BlockItem {
 
 
     public static ItemStack createMonumentMap(Entity entity){
-        return createMap(entity, StructureTags.ON_OCEAN_EXPLORER_MAPS, "filled_map.monument", MapDecoration.Type.MONUMENT);
+        return createMap(entity, StructureTags.ON_OCEAN_EXPLORER_MAPS, "filled_map.monument", MapDecorationTypes.OCEAN_MONUMENT);
     }
 
     public static ItemStack createMansionMap(Entity entity){
-        return createMap(entity, StructureTags.ON_WOODLAND_EXPLORER_MAPS, "filled_map.mansion", MapDecoration.Type.MANSION);
+        return createMap(entity, StructureTags.ON_WOODLAND_EXPLORER_MAPS, "filled_map.mansion", MapDecorationTypes.WOODLAND_MANSION);
     }
 
     public static ItemStack createShipwreckMap(Entity entity){
-        return createMap(entity, StructureTags.SHIPWRECK, "filled_map.shipwreck", MapDecoration.Type.RED_X);
+        return createMap(entity, StructureTags.SHIPWRECK, "filled_map.shipwreck", MapDecorationTypes.RED_X);
     }
 
     public static ItemStack createTreasureMap(Entity entity){
-        return createMap(entity, StructureTags.ON_TREASURE_MAPS, "filled_map.treasure", MapDecoration.Type.RED_X);
+        return createMap(entity, StructureTags.ON_TREASURE_MAPS, "filled_map.treasure", MapDecorationTypes.RED_X);
     }
 
 
-    public static @Nullable ItemStack createMap(Entity entity, TagKey<Structure> structure, String nameKey, MapDecoration.Type iconType) {
+    public static @Nullable ItemStack createMap(Entity entity, TagKey<Structure> structure, String nameKey, Holder<MapDecorationType> iconType) {
         if (!(entity.level() instanceof ServerLevel serverWorld)) {
             return null;
         }
@@ -105,7 +109,7 @@ public class MessageInABottleItem extends BlockItem {
             ItemStack itemStack = MapItem.create(serverWorld, blockPos.getX(), blockPos.getZ(), (byte)2, true, true);
             MapItem.renderBiomePreviewMap(serverWorld, itemStack);
             MapItemSavedData.addTargetDecoration(itemStack, blockPos, "+", iconType);
-            itemStack.setHoverName(Component.translatable(nameKey));
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.translatable(nameKey));
             return itemStack;
         }
         return null;

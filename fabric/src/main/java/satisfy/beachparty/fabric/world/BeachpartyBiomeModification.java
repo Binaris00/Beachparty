@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 
 public class BeachpartyBiomeModification {
     public static void init() {
-        BiomeModification world = BiomeModifications.create(new BeachpartyIdentifier("world_features"));
+        BiomeModification world = BiomeModifications.create(BeachpartyIdentifier.of("world_features"));
         Predicate<BiomeSelectionContext> beachBiomes = getBeachpartySelector();
         world.add(ModificationPhase.ADDITIONS, beachBiomes, ctx -> ctx.getGenerationSettings().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, PlacedFeatures.PALM_TREE_KEY));
         world.add(ModificationPhase.ADDITIONS, beachBiomes, ctx -> ctx.getGenerationSettings().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, PlacedFeatures.SANDWAVES_KEY));
@@ -21,7 +21,7 @@ public class BeachpartyBiomeModification {
     }
 
     private static Predicate<BiomeSelectionContext> getBeachpartySelector() {
-        return BiomeSelectors.tag(TagKey.create(Registries.BIOME, new BeachpartyIdentifier("beach")));
+        return BiomeSelectors.tag(TagKey.create(Registries.BIOME, BeachpartyIdentifier.of("beach")));
     }
 
 

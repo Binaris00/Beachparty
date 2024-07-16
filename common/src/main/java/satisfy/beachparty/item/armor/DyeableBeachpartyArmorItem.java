@@ -16,7 +16,7 @@ import satisfy.beachparty.registry.ArmorRegistry;
 import java.util.List;
 
 
-public class DyeableBeachpartyArmorItem extends DyeableArmorItem implements IBeachpartyArmorSet {
+public class DyeableBeachpartyArmorItem extends ArmorItem implements IBeachpartyArmorSet {
     private final int defaultColor;
     public DyeableBeachpartyArmorItem(ArmorMaterial material, Type slot, int color, Item.Properties settings) {
         super(material, slot, settings);
@@ -37,6 +37,8 @@ public class DyeableBeachpartyArmorItem extends DyeableArmorItem implements IBea
         super.inventoryTick(stack, world, entity, slot, selected);
     }
 
+
+
     @Override
     public int getColor(ItemStack itemStack) {
         CompoundTag compoundTag = itemStack.getTagElement("display");
@@ -44,10 +46,8 @@ public class DyeableBeachpartyArmorItem extends DyeableArmorItem implements IBea
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip, TooltipFlag context) {
-        tooltip.add(Component.translatable("tooltip.beachparty.dyeable").withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC));
-        if (world != null && world.isClientSide()) {
-            ArmorRegistry.appendTooltip(tooltip);
-        }
+    public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+        list.add(Component.translatable("tooltip.beachparty.dyeable").withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC));
+        ArmorRegistry.appendTooltip(list);
     }
 }

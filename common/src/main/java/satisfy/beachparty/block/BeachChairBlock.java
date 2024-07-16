@@ -1,11 +1,11 @@
 package satisfy.beachparty.block;
 
+import com.mojang.serialization.MapCodec;
 import de.cristelknight.doapi.common.util.ChairUtil;
 import de.cristelknight.doapi.common.util.GeneralUtil;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -14,10 +14,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BedPart;
@@ -34,7 +31,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class BeachChairBlock extends HorizontalDirectionalBlock {
-
+	public static final MapCodec<BeachChairBlock> CODEC = simpleCodec(BeachChairBlock::new);
 	public static final EnumProperty<BedPart> PART = BlockStateProperties.BED_PART;
 
 	private static final Supplier<VoxelShape> headShapeSupplier = () -> {
@@ -82,6 +79,11 @@ public class BeachChairBlock extends HorizontalDirectionalBlock {
 		this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(PART, BedPart.FOOT));
 	}
 
+	@Override
+	protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+		return CODEC;
+	}
+
 	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (direction == getDirectionTowardsOtherPart(state.getValue(PART), state.getValue(FACING))) {
 			return neighborState.is(this) && neighborState.getValue(PART) != state.getValue(PART) ? state : Blocks.AIR.defaultBlockState();
@@ -94,12 +96,13 @@ public class BeachChairBlock extends HorizontalDirectionalBlock {
 		return part == BedPart.FOOT ? direction : direction.getOpposite();
 	}
 
-	public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
 		if (!world.isClientSide && player.isCreative()) {
 			removeOtherPart(world, pos, state, player);
 		}
 
 		super.playerWillDestroy(world, pos, state, player);
+		return state;
 	}
 
 
@@ -125,9 +128,8 @@ public class BeachChairBlock extends HorizontalDirectionalBlock {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand
-			hand, BlockHitResult hit) {
-		return ChairUtil.onUse(world, player, hand, hit, 0);
+	protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+		return ChairUtil.onUse(level, player, player.getUsedItemHand(), blockHitResult, 0);
 	}
 
 	@Override

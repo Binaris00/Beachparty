@@ -10,7 +10,7 @@ public class ConfiguredFeatures {
 
 
     public static ResourceKey<ConfiguredFeature<?, ?>> registerKey(String name) {
-        return ResourceKey.create(Registries.CONFIGURED_FEATURE, new BeachpartyIdentifier(name));
+        return ResourceKey.create(Registries.CONFIGURED_FEATURE, BeachpartyIdentifier.of(name));
     }
 }
 

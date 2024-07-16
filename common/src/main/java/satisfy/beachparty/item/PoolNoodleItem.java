@@ -8,14 +8,15 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-public class PoolNoodleItem extends SwordItem implements DyeableLeatherItem {
+public class PoolNoodleItem extends SwordItem {
 
     public PoolNoodleItem(Tier toolMaterial, int attackDamage, float attackSpeed, Properties properties) {
-        super(toolMaterial, attackDamage, attackSpeed, properties);
+        super(toolMaterial, properties);
+        createAttributes(toolMaterial, attackDamage, attackSpeed);
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, Level world, List<Component> tooltip, TooltipFlag tooltipContext) {
-        tooltip.add(Component.translatable("tooltip.beachparty.dyeable").withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC));
+    public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+        list.add(Component.translatable("tooltip.beachparty.dyeable").withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC));
     }
 }

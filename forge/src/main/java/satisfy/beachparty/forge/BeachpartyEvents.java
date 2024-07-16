@@ -1,14 +1,13 @@
 package satisfy.beachparty.forge;
 
-import de.cristelknight.doapi.common.util.VillagerUtil;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.village.VillagerTradesEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import satisfy.beachparty.Beachparty;
 import satisfy.beachparty.forge.registry.VillagersForge;
 import satisfy.beachparty.registry.ObjectRegistry;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BeachpartyEvents {
-    @Mod.EventBusSubscriber(modid = Beachparty.MOD_ID)
+    @EventBusSubscriber(modid = Beachparty.MOD_ID)
     public static class ForgeEvents {
         @SubscribeEvent
         public static void addCustomTrades(VillagerTradesEvent event){

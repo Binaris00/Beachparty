@@ -2,6 +2,7 @@ package satisfy.beachparty.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -13,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -35,7 +36,7 @@ public class PotionItemMixin {
         Player playerEntity = context.getPlayer();
         ItemStack itemStack = context.getItemInHand();
         BlockState blockState = world.getBlockState(blockPos);
-        if (context.getClickedFace() != Direction.DOWN && (blockState.getBlock() == Blocks.SAND || blockState.getBlock() == Blocks.GRAVEL) && PotionUtils.getPotion(itemStack) == Potions.WATER) {
+        if (context.getClickedFace() != Direction.DOWN && (blockState.getBlock() == Blocks.SAND || blockState.getBlock() == Blocks.GRAVEL) && beachparty$isWaterPotion(itemStack)) {
             world.playSound( null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.0F, 1.0F);
             playerEntity.setItemInHand(context.getHand(), ItemUtils.createFilledResult(itemStack, playerEntity, new ItemStack(Items.GLASS_BOTTLE)));
             playerEntity.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
@@ -52,5 +53,10 @@ public class PotionItemMixin {
             world.setBlockAndUpdate(blockPos, blockState.getBlock() == Blocks.GRAVEL ? Blocks.SAND.defaultBlockState() : ObjectRegistry.SANDWAVES.get().defaultBlockState());
             cir.setReturnValue(InteractionResult.sidedSuccess(world.isClientSide));
         }
+    }
+
+    @Unique
+    private boolean beachparty$isWaterPotion(ItemStack itemStack) {
+        return itemStack.get(DataComponents.POTION_CONTENTS) != null && itemStack.get(DataComponents.POTION_CONTENTS).is(Potions.WATER);
     }
 }
