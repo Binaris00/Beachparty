@@ -25,7 +25,7 @@ public class SoundEventRegistry {
     public static final List<RegistrySupplier<SoundEvent>> RADIO_SOUNDS = List.of(RADIO_REGGEA, RADIO_HAWAII, RADIO_TROPICAL, RADIO_BEACHPARTY);
 
     private static RegistrySupplier<SoundEvent> create(String name) {
-        final ResourceLocation id = new BeachpartyIdentifier(name);
+        final ResourceLocation id = BeachpartyIdentifier.of(name);
         return SOUND_EVENTS.register(id, () -> SoundEvent.createVariableRangeEvent(id));
     }
 

@@ -1,6 +1,7 @@
 package satisfy.beachparty.item;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -14,8 +15,8 @@ import java.util.Objects;
 
 public interface IBeachpartyArmorSet {
 
-    Map<ArmorMaterial, MobEffectInstance> MATERIAL_TO_EFFECT_MAP =
-            (new ImmutableMap.Builder<ArmorMaterial, MobEffectInstance>())
+    Map<Holder<ArmorMaterial>, MobEffectInstance> MATERIAL_TO_EFFECT_MAP =
+            (new ImmutableMap.Builder<Holder<ArmorMaterial>, MobEffectInstance>())
                     .put(ArmorMaterialRegistry.BIKINI, new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 14 * 20, 1))
                     .put(ArmorMaterialRegistry.TRUNKS, new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 14 * 20, 1))
                     .put(ArmorMaterialRegistry.SWIM_WINGS, new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 14 * 20, 0))
@@ -34,8 +35,8 @@ public interface IBeachpartyArmorSet {
     }
 
     default void hasSwimwear(Player player) {
-        for (Map.Entry<ArmorMaterial, MobEffectInstance> entry : MATERIAL_TO_EFFECT_MAP.entrySet()) {
-            ArmorMaterial mapArmorMaterial = entry.getKey();
+        for (Map.Entry<Holder<ArmorMaterial>, MobEffectInstance> entry : MATERIAL_TO_EFFECT_MAP.entrySet()) {
+            Holder<ArmorMaterial> mapArmorMaterial = entry.getKey();
             MobEffectInstance mapStatusEffect = entry.getValue();
 
             if (hasCorrectSwimWear(mapArmorMaterial, player)) {
@@ -44,7 +45,7 @@ public interface IBeachpartyArmorSet {
         }
     }
 
-    private boolean hasCorrectSwimWear(ArmorMaterial material, Player player) {
+    private boolean hasCorrectSwimWear(Holder<ArmorMaterial> material, Player player) {
         if (material.equals(ArmorMaterialRegistry.BIKINI) || material.equals(ArmorMaterialRegistry.TRUNKS)) {
             int slot = 1;
             if (!player.getInventory().getArmor(slot).isEmpty()) {
@@ -78,26 +79,26 @@ public interface IBeachpartyArmorSet {
         if (player.getInventory().getArmor(0).isEmpty()) return false;
         Item item = player.getInventory().getArmor(0).getItem();
         if (item instanceof ArmorItem armorItem) {
-            return isSwimwearBoots(armorItem);
+            return isSwimwearBoots(armorItem.getMaterial());
         }
         return false;
     }
 
-    private static boolean isSwimwearBoots(ArmorItem armorItem) {
-        return armorItem.getMaterial() == ArmorMaterialRegistry.CROCS;
+    private static boolean isSwimwearBoots(Holder<ArmorMaterial> armorItem) {
+        return armorItem == ArmorMaterialRegistry.CROCS;
     }
 
     static boolean hasSwimearLeggings(Player player) {
         if (player.getInventory().getArmor(1).isEmpty()) return false;
         Item item = player.getInventory().getArmor(1).getItem();
         if (item instanceof ArmorItem armorItem) {
-            return isSwimwearLeggings(armorItem);
+            return isSwimwearLeggings(armorItem.getMaterial());
         }
         return false;
     }
 
-    private static boolean isSwimwearLeggings(ArmorItem armorItem) {
-        return armorItem.getMaterial() == ArmorMaterialRegistry.TRUNKS || armorItem.getMaterial() == ArmorMaterialRegistry.BIKINI;
+    private static boolean isSwimwearLeggings(Holder<ArmorMaterial> armorItem) {
+        return armorItem == ArmorMaterialRegistry.TRUNKS || armorItem == ArmorMaterialRegistry.BIKINI;
     }
 
     static boolean hasSwimwearBreastplate(Player player) {
@@ -117,13 +118,13 @@ public interface IBeachpartyArmorSet {
         if (player.getInventory().getArmor(3).isEmpty()) return false;
         Item item = player.getInventory().getArmor(3).getItem();
         if (item instanceof ArmorItem armorItem) {
-            return isSwimwearHelmet(armorItem);
+            return isSwimwearHelmet(armorItem.getMaterial());
         }
         return false;
     }
 
 
-    private static boolean isSwimwearHelmet(ArmorItem armorItem) {
-        return armorItem.getMaterial() == ArmorMaterialRegistry.BEACH_HAT || armorItem.getMaterial() == ArmorMaterialRegistry.SUNGLASSES;
+    private static boolean isSwimwearHelmet(Holder<ArmorMaterial> armorItem) {
+        return armorItem == ArmorMaterialRegistry.BEACH_HAT || armorItem == ArmorMaterialRegistry.SUNGLASSES;
     }
 }

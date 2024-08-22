@@ -13,7 +13,7 @@ import satisfy.beachparty.BeachpartyIdentifier;
 @SuppressWarnings("unused")
 public class RubberRingModel<T extends Entity> extends EntityModel<T> {
 
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new BeachpartyIdentifier("rubber_ring_blue"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(BeachpartyIdentifier.of("rubber_ring_blue"), "main");
 	private final ModelPart group;
 	public RubberRingModel(ModelPart root) {
 		this.group = root.getChild("group");
@@ -28,8 +28,9 @@ public class RubberRingModel<T extends Entity> extends EntityModel<T> {
 	@Override
 	public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 	}
+
 	@Override
-	public void renderToBuffer(PoseStack matrices, VertexConsumer vertexConsumer, int light, int overlay, float red, float green, float blue, float alpha) {
-		group.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int j, int k) {
+		group.render(poseStack, vertexConsumer, i, j, k);
 	}
 }

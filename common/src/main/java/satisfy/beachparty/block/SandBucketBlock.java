@@ -43,13 +43,14 @@ public class SandBucketBlock extends FacingBlock {
     }
 
     @Override
-    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
+        InteractionHand hand = blockHitResult.getDirection() == Direction.UP ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         ItemStack itemStack = player.getItemInHand(hand);
         if (state.getBlock() == ObjectRegistry.EMPTY_SAND_BUCKET_BLOCK && itemStack.getItem() == Items.SAND) {
             itemStack.shrink(1);
             world.setBlockAndUpdate(pos, ObjectRegistry.SAND_BUCKET_BLOCK.get().defaultBlockState().setValue(FACING, state.getValue(FACING)));
             return InteractionResult.SUCCESS;
         }
-        return super.use(state, world, pos, player, hand, hit);
+        return super.useWithoutItem(state, world, pos, player, blockHitResult);
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.Blocks;
 import satisfy.beachparty.recipe.MiniFridgeRecipe;
 
@@ -27,7 +28,7 @@ public enum MiniFridgeRecipeBookGroup implements IRecipeBookGroup {
         this.icons = ImmutableList.copyOf(entries);
     }
 
-    public boolean fitRecipe(Recipe<?> recipe, RegistryAccess registryAccess) {
+    public boolean fitRecipe(Recipe<? extends RecipeInput> recipe, RegistryAccess registryAccess) {
         if (recipe instanceof MiniFridgeRecipe miniFridgeRecipe) {
             switch (this) {
                 case SEARCH -> {

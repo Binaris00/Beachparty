@@ -1,43 +1,27 @@
 package satisfy.beachparty.networking.packet;
 
-import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import satisfy.beachparty.block.RadioBlock;
-import satisfy.beachparty.networking.BeachpartyMessages;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+import satisfy.beachparty.BeachpartyIdentifier;
 
-import java.util.List;
+public record MouseScrollC2SPacket(BlockPos pos, int scrollValue) implements CustomPacketPayload {
+    public static final ResourceLocation MOUSE_SCROLL = BeachpartyIdentifier.of("mouse_scroll_c2s");
+    public static final CustomPacketPayload.Type<MouseScrollC2SPacket> PACKET_ID = new CustomPacketPayload.Type<>(MOUSE_SCROLL);
 
-public class MouseScrollC2SPacket implements NetworkManager.NetworkReceiver {
+    public static final StreamCodec<RegistryFriendlyByteBuf, MouseScrollC2SPacket> PACKET_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC, MouseScrollC2SPacket::pos,
+            ByteBufCodecs.INT, MouseScrollC2SPacket::scrollValue,
+            MouseScrollC2SPacket::new
+    );
+
 
     @Override
-    public void receive(FriendlyByteBuf buf, NetworkManager.PacketContext context) {
-        Level serverWorld = context.getPlayer().level();
-        BlockPos blockPos = buf.readBlockPos();
-        int scrollValue = buf.readInt();
-
-        context.queue(() -> {
-            BlockState blockState = serverWorld.getBlockState(blockPos);
-
-            if (blockState.getBlock() instanceof RadioBlock radioBlock) {
-                if (!blockState.getValue(RadioBlock.ON) || blockState.getValue(RadioBlock.SEARCHING)) {
-                    return;
-                }
-
-                int channel = radioBlock.tune(serverWorld, blockState, blockPos, scrollValue);
-
-                FriendlyByteBuf buffer = RadioBlock.createPacketBuf();;
-                buffer.writeBlockPos(blockPos);
-                buffer.writeInt(channel);
-
-                List<ServerPlayer> serverPlayerEntities = context.getPlayer().getServer().getPlayerList().getPlayers();
-                for (ServerPlayer serverPlayer : serverPlayerEntities) {
-                    NetworkManager.sendToPlayer(serverPlayer, BeachpartyMessages.TUNE_RADIO_S2C, buffer);
-                }
-            }
-        });
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return PACKET_ID;
     }
 }

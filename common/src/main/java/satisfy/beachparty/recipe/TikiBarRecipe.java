@@ -1,21 +1,24 @@
 package satisfy.beachparty.recipe;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.cristelknight.doapi.common.util.GeneralUtil;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import satisfy.beachparty.registry.RecipeRegistry;
 
-public class TikiBarRecipe implements Recipe<Container> {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class TikiBarRecipe implements Recipe<RecipeInput> {
     final ResourceLocation id;
     private final NonNullList<Ingredient> inputs;
     private final ItemStack output;
@@ -26,13 +29,21 @@ public class TikiBarRecipe implements Recipe<Container> {
         this.output = output;
     }
 
-    @Override
-    public boolean matches(Container inventory, Level world) {
-        return GeneralUtil.matchesRecipe(inventory, inputs, 1, 2);
+    public TikiBarRecipe(Optional<ResourceLocation> id, List<Ingredient> inputs, ItemStack output) {
+        this.id = id.orElseGet(() -> ResourceLocation.fromNamespaceAndPath("beachparty", "tiki_bar_recipe"));
+        NonNullList<Ingredient> nonNullList = NonNullList.create();
+        nonNullList.addAll(inputs);
+        this.inputs = nonNullList;
+        this.output = output;
     }
 
     @Override
-    public @NotNull ItemStack assemble(Container inventory, RegistryAccess registryAccess) {
+    public boolean matches(RecipeInput recipeInput, Level level) {
+        return GeneralUtil.matchesRecipe(recipeInput, inputs, 1, 2);
+    }
+
+    @Override
+    public @NotNull ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
     }
 
@@ -42,11 +53,10 @@ public class TikiBarRecipe implements Recipe<Container> {
     }
 
     @Override
-    public @NotNull ItemStack getResultItem(RegistryAccess registryAccess) {
+    public @NotNull ItemStack getResultItem(HolderLookup.Provider provider) {
         return this.output.copy();
     }
 
-    @Override
     public @NotNull ResourceLocation getId() {
         return id;
     }
@@ -72,34 +82,39 @@ public class TikiBarRecipe implements Recipe<Container> {
     }
 
     public static class Serializer implements RecipeSerializer<TikiBarRecipe> {
+        public static final MapCodec<TikiBarRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                        ResourceLocation.CODEC.optionalFieldOf("id").forGetter(recipe -> Optional.of(recipe.getId())),
+                        Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(TikiBarRecipe::getIngredients),
+                        ItemStack.CODEC.fieldOf("result").forGetter(recipe -> recipe.output)
+                ).apply(instance, TikiBarRecipe::new)
+        );
 
-        @Override
-        public @NotNull TikiBarRecipe fromJson(ResourceLocation id, JsonObject json) {
-            final var ingredients = GeneralUtil.deserializeIngredients(GsonHelper.getAsJsonArray(json, "ingredients"));
-            if (ingredients.isEmpty()) {
-                throw new JsonParseException("No ingredients for TikiBar Recipe");
-            } else if (ingredients.size() > 4) {
-                throw new JsonParseException("Too many ingredients for TikiBar Recipe");
-            } else {
-                return new TikiBarRecipe(id, ingredients, ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result")));
-            }
+        public static final StreamCodec<RegistryFriendlyByteBuf, TikiBarRecipe> STREAM_CODEC = StreamCodec.of(TikiBarRecipe.Serializer::toNetwork, TikiBarRecipe.Serializer::fromNetwork);
+
+        public static TikiBarRecipe fromNetwork(RegistryFriendlyByteBuf buf) {
+            ResourceLocation id = buf.readResourceLocation();
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+            var children = buf.readCollection(ArrayList::new, buffer -> Ingredient.CONTENTS_STREAM_CODEC.decode(buf));
+            ingredients.addAll(children);
+            final var output = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+
+            return new TikiBarRecipe(id, ingredients, output);
+        }
+
+        public static void toNetwork(RegistryFriendlyByteBuf buf, TikiBarRecipe recipe) {
+            buf.writeResourceLocation(recipe.getId());
+            buf.writeCollection(recipe.getIngredients(), (b, child) -> Ingredient.CONTENTS_STREAM_CODEC.encode(buf, child));
+            ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, recipe.output);
         }
 
         @Override
-        public @NotNull TikiBarRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            final var ingredients  = NonNullList.withSize(buf.readVarInt(), Ingredient.EMPTY);
-            ingredients.replaceAll(ignored -> Ingredient.fromNetwork(buf));
-            return new TikiBarRecipe(id, ingredients, buf.readItem());
+        public @NotNull MapCodec<TikiBarRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf buf, TikiBarRecipe recipe) {
-            buf.writeVarInt(recipe.inputs.size());
-            for (Ingredient ingredient : recipe.inputs) {
-                ingredient.toNetwork(buf);
-            }
-
-            buf.writeItem(recipe.output);
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, TikiBarRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

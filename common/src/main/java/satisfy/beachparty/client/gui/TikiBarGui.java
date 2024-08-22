@@ -10,7 +10,7 @@ import satisfy.beachparty.client.gui.handler.TikiBarGuiHandler;
 import satisfy.beachparty.client.recipebook.TikiBarRecipeBook;
 
 public class TikiBarGui extends AbstractRecipeBookGUIScreen<TikiBarGuiHandler> {
-    public static final ResourceLocation BG = new BeachpartyIdentifier("textures/gui/tiki_bar_gui.png");
+    public static final ResourceLocation BG = BeachpartyIdentifier.of("textures/gui/tiki_bar_gui.png");
 
     public static final int ARROW_Y = 45;
     public static final int ARROW_X = 94;

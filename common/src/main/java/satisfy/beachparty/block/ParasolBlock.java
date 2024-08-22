@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -61,10 +62,11 @@ public class ParasolBlock extends Block {
     }
 
     @Override
-    public @NotNull InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, net.minecraft.world.phys.BlockHitResult blockHitResult) {
-        ItemStack heldItem = player.getItemInHand(interactionHand);
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+        InteractionHand hand = blockHitResult.getDirection() == Direction.UP ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+        ItemStack stack = player.getItemInHand(hand);
 
-        if (heldItem.isEmpty() && player.isCrouching()) {
+        if (stack.isEmpty() && player.isCrouching()) {
             boolean isOpen = !blockState.getValue(OPEN);
             level.setBlockAndUpdate(blockPos, blockState.setValue(OPEN, isOpen));
             DoubleBlockHalf doubleBlockHalf = blockState.getValue(HALF);
@@ -90,7 +92,7 @@ public class ParasolBlock extends Block {
             return InteractionResult.SUCCESS;
         }
 
-        return super.use(blockState, level, blockPos, player, interactionHand, blockHitResult);
+        return super.useWithoutItem(blockState, level, blockPos, player, blockHitResult);
     }
 
     @Override
@@ -146,7 +148,7 @@ public class ParasolBlock extends Block {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
+    public @NotNull BlockState playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
         if (!level.isClientSide) {
             DoubleBlockHalf doubleBlockHalf = blockState.getValue(HALF);
             BlockPos otherPartPos = (doubleBlockHalf == DoubleBlockHalf.LOWER) ? blockPos.above() : blockPos.below();
@@ -160,6 +162,7 @@ public class ParasolBlock extends Block {
         }
 
         super.playerWillDestroy(level, blockPos, blockState, player);
+        return blockState;
     }
 
 

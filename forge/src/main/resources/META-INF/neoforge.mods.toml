@@ -3,9 +3,12 @@ loaderVersion = "[4,)"
 license = "Custom"
 #issueTrackerURL = ""
 
+[[mixins]]
+config = "beachparty-common.mixins.json"
+
 [[mods]]
 modId = "beachparty"
-version = "${version}"
+version = "1.2.0"
 displayName = "[Let's Do] Beachparty"
 authors = "Satisfy, BaumeisterJo, Cristelknight"
 description = '''
@@ -37,6 +40,6 @@ side = "BOTH"
 [[dependencies.beachparty]]
 modId = "doapi"
 type = "required"
-versionRange = "[1.3.0,)"
+versionRange = "[1.3.1,)"
 ordering = "AFTER"
 side = "BOTH"

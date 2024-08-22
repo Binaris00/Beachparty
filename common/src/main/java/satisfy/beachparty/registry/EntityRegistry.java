@@ -14,10 +14,10 @@ import java.util.function.Supplier;
 public class EntityRegistry {
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Beachparty.MOD_ID, Registries.ENTITY_TYPE);
 
-    public static final RegistrySupplier<EntityType<CoconutEntity>> COCONUT = create("coconut", () -> EntityType.Builder.<CoconutEntity>of(CoconutEntity::new, MobCategory.MISC).sized(0.25f, 0.25f).build(new BeachpartyIdentifier("coconut").toString()));
+    public static final RegistrySupplier<EntityType<CoconutEntity>> COCONUT = create("coconut", () -> EntityType.Builder.<CoconutEntity>of(CoconutEntity::new, MobCategory.MISC).sized(0.25f, 0.25f).build(BeachpartyIdentifier.of("coconut").toString()));
 
     public static <T extends EntityType<?>> RegistrySupplier<T> create(final String path, final Supplier<T> type) {
-        return ENTITY_TYPES.register(new BeachpartyIdentifier(path), type);
+        return ENTITY_TYPES.register(BeachpartyIdentifier.of(path), type);
     }
 
     public static void init(){

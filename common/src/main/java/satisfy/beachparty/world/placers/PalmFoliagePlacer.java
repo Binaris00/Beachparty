@@ -1,6 +1,6 @@
 package satisfy.beachparty.world.placers;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,7 +16,8 @@ import satisfy.beachparty.registry.ObjectRegistry;
 import satisfy.beachparty.registry.PlacerTypesRegistry;
 
 public class PalmFoliagePlacer extends FoliagePlacer {
-    public static final Codec<PalmFoliagePlacer> CODEC = RecordCodecBuilder.create((placer) -> foliagePlacerParts(placer).apply(placer, PalmFoliagePlacer::new));
+    public static final MapCodec<PalmFoliagePlacer> CODEC = RecordCodecBuilder.mapCodec((placer) ->
+            foliagePlacerParts(placer).apply(placer, PalmFoliagePlacer::new));
 
     public PalmFoliagePlacer(IntProvider pRadius, IntProvider pOffset) {
         super(pRadius, pOffset);
@@ -57,7 +58,7 @@ public class PalmFoliagePlacer extends FoliagePlacer {
 
         if (pRandom.nextInt(2) == 0) {
             if (pLevel.isStateAtPosition(pos.below(), BlockBehaviour.BlockStateBase::isAir)) {
-                foliageSetter.set(pos.below(), ObjectRegistry.COCONUT_HANGING.get().defaultBlockState());//TODO
+                foliageSetter.set(pos.below(), ObjectRegistry.COCONUT_HANGING.get().defaultBlockState());
             }
         }
         if (pRandom.nextInt(2) == 0) {

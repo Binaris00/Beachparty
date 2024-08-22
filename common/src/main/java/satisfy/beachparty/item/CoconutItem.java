@@ -14,7 +14,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import satisfy.beachparty.entity.CoconutEntity;
 
 import java.util.List;
@@ -46,7 +45,7 @@ public class CoconutItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip, TooltipFlag context) {
-        tooltip.add(Component.translatable("tooltip.beachparty.canbeplaced").withStyle(ITALIC, ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+        list.add(Component.translatable("tooltip.beachparty.canbeplaced").withStyle(ITALIC, ChatFormatting.GRAY));
     }
 }

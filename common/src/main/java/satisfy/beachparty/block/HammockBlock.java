@@ -1,5 +1,6 @@
 package satisfy.beachparty.block;
 
+import com.mojang.serialization.MapCodec;
 import de.cristelknight.doapi.common.util.GeneralUtil;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class HammockBlock extends HorizontalDirectionalBlock {
+    public static final MapCodec<HammockBlock> CODEC = simpleCodec(HammockBlock::new);
     public static final EnumProperty<HammockPart> PART;
     public static final BooleanProperty OCCUPIED;
 
@@ -84,6 +86,11 @@ public class HammockBlock extends HorizontalDirectionalBlock {
     public HammockBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(PART, HammockPart.MIDDLE).setValue(OCCUPIED, false));
+    }
+
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -191,7 +198,7 @@ public class HammockBlock extends HorizontalDirectionalBlock {
     }
 
     @Override
-    public boolean isPathfindable(BlockState state, BlockGetter world, BlockPos pos, PathComputationType type) {
+    protected boolean isPathfindable(BlockState blockState, PathComputationType pathComputationType) {
         return false;
     }
 

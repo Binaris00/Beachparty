@@ -5,7 +5,6 @@ import de.cristelknight.doapi.common.util.GeneralUtil;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -61,13 +60,13 @@ public class LoungeChairBlock extends Block {
               return SHAPE.get(state.getValue(FACING));
          }
 
-         @Override
-         public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand
-         hand, BlockHitResult hit) {
-              return ChairUtil.onUse(world, player, hand, hit, -0.1);
-         }
 
-         @Override
+    @Override
+    protected @NotNull InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+        return ChairUtil.onUse(level, player, player.getUsedItemHand(), blockHitResult, -0.1);
+    }
+
+    @Override
          public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
               super.onRemove(state, world, pos, newState, moved);
               ChairUtil.onStateReplaced(world, pos);

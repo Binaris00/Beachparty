@@ -63,10 +63,12 @@ public class SandCastleBlock extends Block {
     }
 
     @Override
-    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
+        InteractionHand hand = blockHitResult.getDirection() == Direction.UP ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+
         ItemStack handStack = player.getItemInHand(hand);
         if (handStack.getItem() == ObjectRegistry.SAND_BUCKET.get() && !hasAllTowers(state)) {
-            BooleanProperty tower = getTowerHitPos(hit);
+            BooleanProperty tower = getTowerHitPos(blockHitResult);
             if (!state.getValue(tower)) {
                 world.setBlockAndUpdate(pos, state.setValue(tower, true));
                 exchangeStack(handStack, player, new ItemStack(ObjectRegistry.EMPTY_SAND_BUCKET.get()));
@@ -79,7 +81,7 @@ public class SandCastleBlock extends Block {
                 exchangeStack(handStack, player, new ItemStack(ObjectRegistry.SAND_BUCKET.get()));
                 return InteractionResult.sidedSuccess(world.isClientSide);
             } else if (!hasNoTowers(state)) {
-                BooleanProperty tower = getTowerHitPos(hit);
+                BooleanProperty tower = getTowerHitPos(blockHitResult);
                 if (state.getValue(tower)) {
                     world.setBlockAndUpdate(pos, state.setValue(tower, false));
                     exchangeStack(handStack, player, new ItemStack(ObjectRegistry.SAND_BUCKET.get()));
@@ -166,7 +168,7 @@ public class SandCastleBlock extends Block {
     }
 
     @Override
-    public @NotNull ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
         return new ItemStack(ObjectRegistry.SAND_BUCKET.get());
     }
 

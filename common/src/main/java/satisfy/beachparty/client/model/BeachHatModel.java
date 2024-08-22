@@ -13,7 +13,7 @@ import satisfy.beachparty.BeachpartyIdentifier;
 @SuppressWarnings("unused")
 public class BeachHatModel<T extends Entity> extends EntityModel<T> {
 
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new BeachpartyIdentifier("beach_hat"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(BeachpartyIdentifier.of("beach_hat"), "main");
 
 	private final ModelPart beach_hat;
 	public BeachHatModel(ModelPart root) {
@@ -32,8 +32,9 @@ public class BeachHatModel<T extends Entity> extends EntityModel<T> {
 	@Override
 	public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 	}
+
 	@Override
-	public void renderToBuffer(PoseStack matrices, VertexConsumer vertexConsumer, int light, int overlay, float red, float green, float blue, float alpha) {
-		beach_hat.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int j, int k) {
+		beach_hat.render(poseStack, vertexConsumer, i, j, k);
 	}
 }

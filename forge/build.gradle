@@ -4,9 +4,7 @@ plugins {
 
 architectury {
     platformSetupLoomIde()
-    neoForge {
-        platformPackage = "forge"
-    }
+    neoForge ()
 }
 
 def jarFileName = 'letsdo-beachparty-forge'
@@ -39,6 +37,8 @@ dependencies {
     modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
     modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
     modRuntimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+
+    forgeRuntimeLibrary("blue.endless:jankson:1.2.3")
 
     modImplementation "maven.modrinth:do-api:${project.doapi_version}-forge"
 

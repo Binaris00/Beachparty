@@ -1,0 +1,15 @@
+{
+  "type": "beachparty:mini_fridge_mixing",
+  "ingredients": [
+    {
+      "item": "minecraft:cactus"
+    },
+    {
+      "item": "minecraft:ice"
+    }
+  ],
+  "result": {
+    "id": "beachparty:icecream_cactus",
+    "count": 1
+  }
+}

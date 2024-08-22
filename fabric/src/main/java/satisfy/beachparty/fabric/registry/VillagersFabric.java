@@ -21,13 +21,13 @@ public class VillagersFabric {
 
     private static final ResourceLocation BEACH_GUY_POI_IDENTIFIER = BeachpartyIdentifier.of("beach_guy_poi");
     public static final PoiType BEACH_GUY_POI = PointOfInterestHelper.register(BEACH_GUY_POI_IDENTIFIER, 1, 12, ObjectRegistry.LOUNGE_CHAIR.get());
-    public static final VillagerProfession BEACH_GUY = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, new ResourceLocation("beachparty", "beach_guy"), VillagerProfessionBuilder.create().id(new ResourceLocation("beachparty", "beach_guy")).workstation(ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, BEACH_GUY_POI_IDENTIFIER)).build());
+    public static final VillagerProfession BEACH_GUY = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, ResourceLocation.fromNamespaceAndPath("beachparty", "beach_guy"), VillagerProfessionBuilder.create().id(ResourceLocation.fromNamespaceAndPath("beachparty", "beach_guy")).workstation(ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, BEACH_GUY_POI_IDENTIFIER)).build());
 
     private static final ResourceLocation BARKEEPER_POI_IDENTIFIER = BeachpartyIdentifier.of("barkeeper_poi");
     public static final PoiType BARKEEPER_POI = PointOfInterestHelper.register(BARKEEPER_POI_IDENTIFIER, 1, 12, ObjectRegistry.TIKI_BAR.get());
-    public static final VillagerProfession BARKEEPER = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, new ResourceLocation("beachparty", "barkeeper"), VillagerProfessionBuilder.create().id(new ResourceLocation("beachparty", "barkeeper")).workstation(ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, BARKEEPER_POI_IDENTIFIER)).build());
+    public static final VillagerProfession BARKEEPER = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, ResourceLocation.fromNamespaceAndPath("beachparty", "barkeeper"), VillagerProfessionBuilder.create().id(ResourceLocation.fromNamespaceAndPath("beachparty", "barkeeper")).workstation(ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, BARKEEPER_POI_IDENTIFIER)).build());
 
-    public static final VillagerType BEACH = Registry.register(BuiltInRegistries.VILLAGER_TYPE, new ResourceLocation("beachparty", "beachparty"), new VillagerType("beachparty"));
+    public static final VillagerType BEACH = Registry.register(BuiltInRegistries.VILLAGER_TYPE, ResourceLocation.fromNamespaceAndPath("beachparty", "beachparty"), new VillagerType("beachparty"));
 
 
     

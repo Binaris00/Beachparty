@@ -1,7 +1,6 @@
 package satisfy.beachparty.client;
 
 
-import de.cristelknight.doapi.common.util.GeneralUtil;
 import de.cristelknight.doapi.terraform.sign.TerraformSignHelper;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
@@ -31,13 +30,14 @@ public class BeachPartyClient {
                 ObjectRegistry.DECK_CHAIR.get(), ObjectRegistry.PALM_SAPLING.get(), ObjectRegistry.HAMMOCK.get(),
                 ObjectRegistry.SEASHELL_BLOCK.get()
         );
-
-        MenuRegistry.registerScreenFactory(ScreenHandlerTypesRegistry.TIKI_BAR_GUI_HANDLER.get(), TikiBarGui::new);
-        MenuRegistry.registerScreenFactory(ScreenHandlerTypesRegistry.MINI_FRIDGE_GUI_HANDLER.get(), MiniFridgeGui::new);
-
+        registerMenu();
 
         BeachpartyMessages.registerS2CPackets();
-        initColorItems();
+    }
+
+    public static void registerMenu(){
+        MenuRegistry.registerScreenFactory(ScreenHandlerTypesRegistry.TIKI_BAR_GUI_HANDLER.get(), TikiBarGui::new);
+        MenuRegistry.registerScreenFactory(ScreenHandlerTypesRegistry.MINI_FRIDGE_GUI_HANDLER.get(), MiniFridgeGui::new);
     }
 
     public static void preInitClient(){
@@ -46,13 +46,6 @@ public class BeachPartyClient {
 
         registerEntityEntityRenderers();
         registerEntityModelLayers();
-    }
-
-    private static void initColorItems() {
-        GeneralUtil.registerColorArmor(ObjectRegistry.TRUNKS.get(), 16715535);
-        GeneralUtil.registerColorArmor(ObjectRegistry.BIKINI.get(), 987135);
-        GeneralUtil.registerColorArmor(ObjectRegistry.CROCS.get(), 1048335);
-        GeneralUtil.registerColorArmor(ObjectRegistry.POOL_NOODLE.get(), 1017855);
     }
 
     public static void registerEntityEntityRenderers(){

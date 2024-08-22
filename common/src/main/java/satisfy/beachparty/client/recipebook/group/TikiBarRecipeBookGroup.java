@@ -8,6 +8,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.Blocks;
 import satisfy.beachparty.recipe.TikiBarRecipe;
 import satisfy.beachparty.registry.ObjectRegistry;
@@ -28,7 +29,7 @@ public enum TikiBarRecipeBookGroup implements IRecipeBookGroup {
         this.icons = ImmutableList.copyOf(entries);
     }
 
-    public boolean fitRecipe(Recipe<?> recipe, RegistryAccess registryAccess) {
+    public boolean fitRecipe(Recipe<? extends RecipeInput> recipe, RegistryAccess registryAccess) {
         if (recipe instanceof TikiBarRecipe tikiBarRecipe) {
             switch (this) {
                 case SEARCH -> {

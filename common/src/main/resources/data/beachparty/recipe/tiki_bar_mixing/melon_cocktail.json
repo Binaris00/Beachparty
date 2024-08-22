@@ -1,0 +1,15 @@
+{
+  "type": "beachparty:tiki_bar_mixing",
+  "ingredients": [
+    {
+      "item": "minecraft:melon_slice"
+    },
+    {
+      "item": "minecraft:ice"
+    }
+  ],
+  "result": {
+    "id": "beachparty:melon_cocktail",
+    "count": 1
+  }
+}

@@ -2,8 +2,8 @@ package satisfy.beachparty.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.TorchBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -33,8 +34,8 @@ public class TallTorchBlock extends TorchBlock {
     private static final VoxelShape BOTTOM_SHAPE = Block.box(6.0, 0.0, 6.0, 10.0, 16.0, 10.0);
 
 
-    public TallTorchBlock(Properties settings, ParticleOptions particle) {
-        super(settings, particle);
+    public TallTorchBlock(SimpleParticleType simpleParticleType, BlockBehaviour.Properties properties) {
+        super(simpleParticleType, properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(HALF, DoubleBlockHalf.LOWER));
     }
 

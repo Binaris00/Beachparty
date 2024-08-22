@@ -38,7 +38,8 @@ public class CoconutBlock extends Block{
     }
 
     @Override
-    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
+        InteractionHand hand = blockHitResult.getDirection() == Direction.UP ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         final ItemStack stack = player.getItemInHand(hand);
         if (stack.getItem() == this.asItem()) {
             if (state.getBlock() instanceof CoconutBlock && state.getValue(STACK) < 3) {
@@ -69,7 +70,7 @@ public class CoconutBlock extends Block{
             player.addItem(this.asItem().getDefaultInstance());
             return InteractionResult.SUCCESS;
         }
-        return super.use(state, world, pos, player, hand, hit);
+        return super.useWithoutItem(state, world, pos, player, blockHitResult);
     }
 
     public boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {

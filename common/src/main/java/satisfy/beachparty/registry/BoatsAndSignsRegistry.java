@@ -14,15 +14,14 @@ import satisfy.beachparty.BeachpartyIdentifier;
 
 public class BoatsAndSignsRegistry {
 
-    public static ResourceLocation PALM_BOAT_TYPE = new BeachpartyIdentifier("palm");
-    public static ResourceLocation FLOATY_BOAT_TYPE = new BeachpartyIdentifier("floaty");
+    public static ResourceLocation PALM_BOAT_TYPE = BeachpartyIdentifier.of("palm");
+    public static ResourceLocation FLOATY_BOAT_TYPE = BeachpartyIdentifier.of("floaty");
 
-    public static final ResourceLocation PALM_SIGN_TEXTURE = new BeachpartyIdentifier("entity/signs/palm");
+    public static final ResourceLocation PALM_SIGN_TEXTURE = BeachpartyIdentifier.of("entity/signs/palm");
 
 
-    public static final ResourceLocation PALM_HANGING_SIGN_TEXTURE = new BeachpartyIdentifier("entity/signs/hanging/palm");
-    public static final ResourceLocation PALM_HANGING_SIGN_GUI_TEXTURE = new BeachpartyIdentifier("textures/gui/hanging_signs/palm");
-
+    public static final ResourceLocation PALM_HANGING_SIGN_TEXTURE = BeachpartyIdentifier.of("entity/signs/hanging/palm");
+    public static final ResourceLocation PALM_HANGING_SIGN_GUI_TEXTURE = BeachpartyIdentifier.of("textures/gui/hanging_signs/palm");
 
     public static final RegistrySupplier<Block> PALM_SIGN = ObjectRegistry.registerWithoutItem("palm_sign", () -> TerraformSignHelper.getSign(PALM_SIGN_TEXTURE));
     public static final RegistrySupplier<Block> PALM_WALL_SIGN = ObjectRegistry.registerWithoutItem("palm_wall_sign", () -> TerraformSignHelper.getWallSign(PALM_SIGN_TEXTURE));
@@ -37,6 +36,7 @@ public class BoatsAndSignsRegistry {
     public static RegistrySupplier<Item> FLOATY_CHEST_BOAT = TerraformBoatItemHelper.registerBoatItem(ObjectRegistry.ITEMS, "floaty_chest_boat", FLOATY_BOAT_TYPE, true);
 
     public static void init() {
+
         DoApiCommonEP.registerBoatType(PALM_BOAT_TYPE, new TerraformBoatType.Builder().item(PALM_BOAT).chestItem(PALM_CHEST_BOAT).build());
         DoApiCommonEP.registerBoatType(FLOATY_BOAT_TYPE, new TerraformBoatType.Builder().item(FLOATY).chestItem(FLOATY_CHEST_BOAT).build());
     }

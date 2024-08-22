@@ -66,7 +66,7 @@ public class SeashellItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, Level world, List<Component> tooltip, TooltipFlag tooltipContext) {
-        tooltip.add(Component.translatable("tooltip.beachparty.message").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+        list.add(Component.translatable("tooltip.beachparty.message").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
     }
 }

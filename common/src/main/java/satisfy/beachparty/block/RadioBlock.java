@@ -7,8 +7,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,6 +18,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -35,7 +37,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
-import satisfy.beachparty.networking.BeachpartyMessages;
+import satisfy.beachparty.networking.packet.TurnRadioS2CPacket;
 import satisfy.beachparty.registry.SoundEventRegistry;
 
 import java.util.HashMap;
@@ -81,7 +83,9 @@ public class RadioBlock extends Block {
     }
 
     @Override
-    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
+        InteractionHand hand = blockHitResult.getDirection() == Direction.UP ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+
         if (state.getValue(SEARCHING)) {
             return InteractionResult.CONSUME;
         }
@@ -106,7 +110,7 @@ public class RadioBlock extends Block {
                 return InteractionResult.SUCCESS;
             }
         }
-        return super.use(state, world, pos, player, hand, hit);
+        return super.useWithoutItem(state, world, pos, player, blockHitResult);
     }
 
     private void turnON(BlockState state, Level world, BlockPos pos, Player player) {
@@ -144,16 +148,13 @@ public class RadioBlock extends Block {
 
     private void sendPacket(BlockState state, ServerLevel world, BlockPos pos, boolean on) {
         for (ServerPlayer player : world.players()) {
-            FriendlyByteBuf buffer = createPacketBuf();
-            buffer.writeBlockPos(pos);
-            buffer.writeInt(state.getValue(CHANNEL));
-            buffer.writeBoolean(on);
-            NetworkManager.sendToPlayer(player, BeachpartyMessages.TURN_RADIO_S2C, buffer);
+            TurnRadioS2CPacket packet = new TurnRadioS2CPacket(pos, state.getValue(CHANNEL), on);
+            NetworkManager.sendToPlayer(player, packet);
         }
     }
 
-    public static FriendlyByteBuf createPacketBuf(){
-        return new FriendlyByteBuf(Unpooled.buffer());
+    public static RegistryFriendlyByteBuf createPacketBuf(RegistryAccess access){
+        return new RegistryFriendlyByteBuf(Unpooled.buffer(), access);
     }
 
     @Override
@@ -202,8 +203,8 @@ public class RadioBlock extends Block {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, BlockGetter world, List<Component> tooltip, TooltipFlag tooltipContext) {
-        tooltip.add(Component.translatable("tooltip.beachparty.canbeplaced").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+        list.add(Component.translatable("tooltip.beachparty.canbeplaced").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
     }
 
     static {

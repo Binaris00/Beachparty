@@ -1,10 +1,7 @@
 package satisfy.beachparty.block.entity;
 
 import de.cristelknight.doapi.common.world.ImplementedInventory;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -17,6 +14,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -29,7 +28,10 @@ import satisfy.beachparty.recipe.TikiBarRecipe;
 import satisfy.beachparty.registry.BlockEntityRegistry;
 import satisfy.beachparty.registry.RecipeRegistry;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TikiBarBlockEntity extends BlockEntity implements ImplementedInventory, BlockEntityTicker<TikiBarBlockEntity>, MenuProvider {
     private static final int[] SLOTS_FOR_SIDE = new int[]{2};
@@ -77,46 +79,69 @@ public class TikiBarBlockEntity extends BlockEntity implements ImplementedInvent
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
+    protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
+        super.loadAdditional(compoundTag, provider);
         this.inventory = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(nbt, this.inventory);
-        this.shakingTime = nbt.getShort("ShakingTime");
-        this.experience = nbt.getFloat("Experience");
+        ContainerHelper.loadAllItems(compoundTag, this.inventory, provider);
+        this.shakingTime = compoundTag.getInt("ShakingTime");
+        this.totalShakingTime = compoundTag.getInt("TotalShakingTime");
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt) {
-        super.saveAdditional(nbt);
-        ContainerHelper.saveAllItems(nbt, this.inventory);
-        nbt.putFloat("Experience", this.experience);
-        nbt.putShort("ShakingTime", (short) this.shakingTime);
+    protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
+        super.saveAdditional(compoundTag, provider);
+        ContainerHelper.saveAllItems(compoundTag, this.inventory, provider);
+        compoundTag.putFloat("Experience", this.experience);
+        compoundTag.putShort("ShakingTime", (short) this.shakingTime);
     }
 
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, TikiBarBlockEntity blockEntity) {
         if (world.isClientSide) return;
-        boolean dirty = false;
-        final var recipeType = world.getRecipeManager()
-                .getRecipeFor(RecipeRegistry.TIKI_BAR_RECIPE_TYPE.get(), blockEntity, world)
-                .orElse(null);
-        assert level != null;
-        RegistryAccess access = level.registryAccess();
-        if (canCraft(recipeType, access)) {
-            this.shakingTime++;
+        AtomicBoolean dirty = new AtomicBoolean(false);
 
-            if (this.shakingTime == this.totalShakingTime) {
+        RecipeManager recipeManager = world.getRecipeManager();
+        List<RecipeHolder<TikiBarRecipe>> recipes = recipeManager.getAllRecipesFor(RecipeRegistry.TIKI_BAR_RECIPE_TYPE.get());
+        Optional<TikiBarRecipe> recipeOptional = Optional.ofNullable(getRecipe(recipes, inventory));
+
+        recipeOptional.ifPresent(recipe ->{
+            if (canCraft(recipe, world.registryAccess())) {
+                this.shakingTime++;
+                if (this.shakingTime == this.totalShakingTime) {
+                    this.shakingTime = 0;
+                    craft(recipe, world.registryAccess());
+                    dirty.set(true);
+                }
+            } else {
                 this.shakingTime = 0;
-                craft(recipeType, access);
-                dirty = true;
             }
-        } else {
-            this.shakingTime = 0;
-        }
-        if (dirty) {
+        });
+
+        if (dirty.get()) {
             setChanged();
         }
+    }
 
+    private TikiBarRecipe getRecipe(List<RecipeHolder<TikiBarRecipe>> recipes, NonNullList<ItemStack> inventory) {
+        recipeLoop:
+        for (RecipeHolder<TikiBarRecipe> recipeHolder : recipes) {
+            TikiBarRecipe recipe = recipeHolder.value();
+            for (Ingredient ingredient : recipe.getIngredients()) {
+                boolean ingredientFound = false;
+                for (int slotIndex = 1; slotIndex < inventory.size(); slotIndex++) {
+                    ItemStack slotItem = inventory.get(slotIndex);
+                    if (ingredient.test(slotItem)) {
+                        ingredientFound = true;
+                        break;
+                    }
+                }
+                if (!ingredientFound) {
+                    continue recipeLoop;
+                }
+            }
+            return recipe;
+        }
+        return null;
     }
 
     private boolean canCraft(TikiBarRecipe recipe, RegistryAccess access) {

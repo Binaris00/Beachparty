@@ -2,14 +2,14 @@ package satisfy.beachparty.item.armor;
 
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import satisfy.beachparty.item.IBeachpartyArmorSet;
 import satisfy.beachparty.registry.ArmorRegistry;
 
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class DyeableBeachpartyArmorItem extends ArmorItem implements IBeachpartyArmorSet {
     private final int defaultColor;
-    public DyeableBeachpartyArmorItem(ArmorMaterial material, Type slot, int color, Item.Properties settings) {
+    public DyeableBeachpartyArmorItem(Holder<ArmorMaterial> material, Type slot, int color, Item.Properties settings) {
         super(material, slot, settings);
         defaultColor = color;
     }
@@ -37,12 +37,8 @@ public class DyeableBeachpartyArmorItem extends ArmorItem implements IBeachparty
         super.inventoryTick(stack, world, entity, slot, selected);
     }
 
-
-
-    @Override
     public int getColor(ItemStack itemStack) {
-        CompoundTag compoundTag = itemStack.getTagElement("display");
-        return compoundTag != null && compoundTag.contains("color", 99) ? compoundTag.getInt("color") : this.defaultColor;
+        return itemStack.getOrDefault(DataComponents.DYED_COLOR, new DyedItemColor(defaultColor, false)).rgb();
     }
 
     @Override

@@ -5,7 +5,6 @@ import de.cristelknight.doapi.common.util.GeneralUtil;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
@@ -72,10 +71,10 @@ public class DeckChairBlock extends BeachChairBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        Direction clickedFace = hit.getDirection();
-        if (state.getValue(FACING) == clickedFace && state.getValue(PART) == BedPart.FOOT) {
-            return ChairUtil.onUse(world, player, hand, hit, 0.1);
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+        Direction direction = blockHitResult.getDirection();
+        if(blockState.getValue(FACING) == direction && blockState.getValue(PART) == BedPart.FOOT){
+            return ChairUtil.onUse(level, player, player.getUsedItemHand(), blockHitResult, 0.1);
         } else {
             return InteractionResult.PASS;
         }

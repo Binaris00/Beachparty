@@ -6,9 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import satisfy.beachparty.BeachpartyIdentifier;
 import satisfy.beachparty.registry.ArmorMaterialRegistry;
 import satisfy.beachparty.registry.ArmorRegistry;
@@ -24,7 +21,7 @@ public class BeachHatItem extends CustomHatItem {
 
     @Override
     public ResourceLocation getTexture() {
-        return new BeachpartyIdentifier("textures/entity/beach_hat.png");
+        return BeachpartyIdentifier.of("textures/entity/beach_hat.png");
     }
 
     @Override
@@ -33,9 +30,7 @@ public class BeachHatItem extends CustomHatItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip, TooltipFlag context) {
-        if (world != null && world.isClientSide()) {
-            ArmorRegistry.appendTooltip(tooltip);
-        }
+    public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+        ArmorRegistry.appendTooltip(list);
     }
 }

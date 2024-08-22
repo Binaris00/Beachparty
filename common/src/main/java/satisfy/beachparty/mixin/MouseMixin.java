@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.Options;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import satisfy.beachparty.block.RadioBlock;
-import satisfy.beachparty.networking.BeachpartyMessages;
+import satisfy.beachparty.networking.packet.MouseScrollC2SPacket;
 import satisfy.beachparty.registry.ObjectRegistry;
 
 @Mixin(MouseHandler.class)
@@ -35,7 +35,7 @@ public class MouseMixin {
                 if (blockState.getBlock() != ObjectRegistry.RADIO.get() || !blockState.getValue(RadioBlock.ON)) return;
 
                 int scrollValue = (int) beachparty$calculateScrollValue(vertical, client.options);
-                beachparty$handleScrollEvent(blockPos, scrollValue);
+                beachparty$handleScrollEvent(blockPos, scrollValue, client.level.registryAccess());
                 ci.cancel();
             }
         }
@@ -47,13 +47,12 @@ public class MouseMixin {
     }
 
     @Unique
-    private void beachparty$handleScrollEvent(BlockPos blockPos, int scrollValue) {
+    private void beachparty$handleScrollEvent(BlockPos blockPos, int scrollValue, RegistryAccess access) {
         if (scrollValue == 0) {
             return;
         }
-        FriendlyByteBuf buffer = RadioBlock.createPacketBuf();
-        buffer.writeBlockPos(blockPos);
-        buffer.writeInt(scrollValue);
-        NetworkManager.sendToServer(BeachpartyMessages.MOUSE_SCROLL_C2S, buffer);
+
+        MouseScrollC2SPacket packet = new MouseScrollC2SPacket(blockPos, scrollValue);
+        NetworkManager.sendToServer(packet);
     }
 }

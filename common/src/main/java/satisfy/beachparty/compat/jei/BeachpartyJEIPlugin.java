@@ -11,7 +11,10 @@ import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.NotNull;
 import satisfy.beachparty.BeachpartyIdentifier;
 import satisfy.beachparty.client.gui.handler.MiniFridgeGuiHandler;
 import satisfy.beachparty.client.gui.handler.TikiBarGuiHandler;
@@ -41,16 +44,25 @@ public class BeachpartyJEIPlugin implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registration) {
         RecipeManager rm = Objects.requireNonNull(Minecraft.getInstance().level).getRecipeManager();
 
-        List<MiniFridgeRecipe> fridgeRecipes = rm.getAllRecipesFor(RecipeRegistry.MINI_FRIDGE_RECIPE_TYPE.get());
+        List<RecipeHolder<MiniFridgeRecipe>> fridgeHolderRecipes = rm.getAllRecipesFor(RecipeRegistry.MINI_FRIDGE_RECIPE_TYPE.get());
+        List<MiniFridgeRecipe> fridgeRecipes = Lists.newArrayList();
+        for (RecipeHolder<MiniFridgeRecipe> holder : fridgeHolderRecipes) {
+            fridgeRecipes.add(holder.value());
+        }
         registration.addRecipes(MiniFridgeCategory.MINI_FRIDGE, fridgeRecipes);
 
-        List<TikiBarRecipe> tikiBarRecipes = rm.getAllRecipesFor(RecipeRegistry.TIKI_BAR_RECIPE_TYPE.get());
+        List<RecipeHolder<TikiBarRecipe>> tikiHolderBarRecipes = rm.getAllRecipesFor(RecipeRegistry.TIKI_BAR_RECIPE_TYPE.get());
+        List<TikiBarRecipe> tikiBarRecipes = Lists.newArrayList();
+        for (RecipeHolder<TikiBarRecipe> holder : tikiHolderBarRecipes) {
+            tikiBarRecipes.add(holder.value());
+        }
+
         registration.addRecipes(TikiBarCategory.TIKI_BAR, tikiBarRecipes);
     }
 
     @Override
-    public ResourceLocation getPluginUid() {
-        return new BeachpartyIdentifier("jei_plugin");
+    public @NotNull ResourceLocation getPluginUid() {
+        return BeachpartyIdentifier.of("jei_plugin");
     }
 
     @Override

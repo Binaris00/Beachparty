@@ -10,7 +10,7 @@ import satisfy.beachparty.client.gui.handler.MiniFridgeGuiHandler;
 import satisfy.beachparty.client.recipebook.MiniFridgeRecipeBook;
 
 public class MiniFridgeGui extends AbstractRecipeBookGUIScreen<MiniFridgeGuiHandler> {
-    public static final ResourceLocation BG = new BeachpartyIdentifier("textures/gui/freezer.png");
+    public static final ResourceLocation BG = BeachpartyIdentifier.of("textures/gui/freezer.png");
 
     public static final int ARROW_Y = 45;
     public static final int ARROW_X = 94;

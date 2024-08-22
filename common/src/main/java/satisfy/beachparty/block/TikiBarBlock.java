@@ -1,11 +1,11 @@
 package satisfy.beachparty.block;
 
+import com.mojang.serialization.MapCodec;
 import de.cristelknight.doapi.common.util.GeneralUtil;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -35,10 +35,16 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("deprecation")
 public class TikiBarBlock extends BaseEntityBlock implements EntityBlock {
+    public static final MapCodec<TikiBarBlock> CODEC = simpleCodec(TikiBarBlock::new);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TikiBarBlock(Properties settings) {
         super(settings);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     private static final Supplier<VoxelShape> voxelShapeSupplier = () -> {
@@ -98,16 +104,13 @@ public class TikiBarBlock extends BaseEntityBlock implements EntityBlock {
     }
 
     @Override
-    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos,
-                                          Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!world.isClientSide) {
-            MenuProvider screenHandlerFactory = state.getMenuProvider(world, pos);
-
-            if (screenHandlerFactory != null) {
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+        if(!level.isClientSide){
+            MenuProvider screenHandlerFactory = blockState.getMenuProvider(level, blockPos);
+            if(screenHandlerFactory != null){
                 player.openMenu(screenHandlerFactory);
             }
         }
-
         return InteractionResult.SUCCESS;
     }
 

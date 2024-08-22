@@ -33,7 +33,7 @@ public class CoconutEntity extends ThrowableItemProjectile {
     }
 
     private ParticleOptions getParticleParameters() {
-        ItemStack itemStack = this.getItemRaw();
+        ItemStack itemStack = this.getItem();
         return (itemStack.isEmpty() ? ParticleTypes.ITEM_SNOWBALL: new ItemParticleOption(ParticleTypes.ITEM, itemStack));
     }
 

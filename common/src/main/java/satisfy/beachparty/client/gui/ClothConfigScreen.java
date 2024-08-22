@@ -13,6 +13,7 @@ import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -24,13 +25,15 @@ import satisfy.beachparty.config.BeachpartyConfig;
 public class ClothConfigScreen {
 
     private static Screen lastScreen;
+    private static final WidgetSprites DISCORD = new WidgetSprites(DoApiRL.asResourceLocation("textures/gui/dc.png"), DoApiRL.asResourceLocation("textures/gui/dc.png"));
+    private static final WidgetSprites CF = new WidgetSprites(DoApiRL.asResourceLocation("textures/gui/cf.png"), DoApiRL.asResourceLocation("textures/gui/cf.png"));
 
     public static Screen create(Screen parent) {
         lastScreen = parent;
         BeachpartyConfig config = BeachpartyConfig.getActiveInstance().getConfig();
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
-                .setDefaultBackgroundTexture(new ResourceLocation("textures/block/sand.png"))
+                .setDefaultBackgroundTexture(ResourceLocation.withDefaultNamespace("textures/block/sand.png"))
                 .setTitle(Component.translatable(Beachparty.MOD_ID + ".config.title").withStyle(ChatFormatting.BOLD));
 
 
@@ -97,12 +100,12 @@ public class ClothConfigScreen {
             if (confirmed) {
                 Util.getPlatform().openUri(dcLink);
             }
-            Minecraft.getInstance().setScreen(create(finalLastScreen)); }, dcLink, true)), new DoApiRL("textures/gui/dc.png"), 3));
+            Minecraft.getInstance().setScreen(create(finalLastScreen)); }, dcLink, true)), DISCORD, 3));
         category.addEntry(tle);
         category.addEntry(new LinkEntry(CCUtil.entryName(MOD_ID,"h"), buttonWidget -> Minecraft.getInstance().setScreen(new ConfirmLinkScreen(confirmed -> {
             if (confirmed) {
                 Util.getPlatform().openUri(cfLink);
             }
-            Minecraft.getInstance().setScreen(create(finalLastScreen)); }, cfLink, true)), new DoApiRL("textures/gui/cf.png"), 10));
+            Minecraft.getInstance().setScreen(create(finalLastScreen)); }, cfLink, true)), CF, 10));
     }
 }

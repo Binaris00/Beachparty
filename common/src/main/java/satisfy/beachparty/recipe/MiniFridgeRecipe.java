@@ -1,21 +1,24 @@
 package satisfy.beachparty.recipe;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.cristelknight.doapi.common.util.GeneralUtil;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import satisfy.beachparty.registry.RecipeRegistry;
 
-public class MiniFridgeRecipe implements Recipe<Container> {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class MiniFridgeRecipe implements Recipe<RecipeInput> {
 
     final ResourceLocation id;
     private final NonNullList<Ingredient> inputs;
@@ -27,13 +30,21 @@ public class MiniFridgeRecipe implements Recipe<Container> {
         this.output = output;
     }
 
-    @Override
-    public boolean matches(Container inventory, Level world) {
-        return GeneralUtil.matchesRecipe(inventory, inputs, 1, 2);
+    public MiniFridgeRecipe(Optional<ResourceLocation> id, List<Ingredient> inputs, ItemStack output) {
+        this.id = id.orElseGet(() -> ResourceLocation.fromNamespaceAndPath("beachparty", "mini_fridge_recipe"));
+        NonNullList<Ingredient> nonNullList = NonNullList.create();
+        nonNullList.addAll(inputs);
+        this.inputs = nonNullList;
+        this.output = output;
     }
 
     @Override
-    public @NotNull ItemStack assemble(Container inventory, RegistryAccess registryAccess) {
+    public boolean matches(RecipeInput recipeInput, Level level) {
+        return GeneralUtil.matchesRecipe(recipeInput, inputs, 1, 2);
+    }
+
+    @Override
+    public @NotNull ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
     }
 
@@ -43,11 +54,15 @@ public class MiniFridgeRecipe implements Recipe<Container> {
     }
 
     @Override
-    public @NotNull ItemStack getResultItem(RegistryAccess registryAccess) {
+    public @NotNull ItemStack getResultItem(HolderLookup.Provider provider) {
         return this.output.copy();
     }
 
-    @Override
+    public @NotNull ItemStack result(){
+        return this.output.copy();
+    }
+
+
     public @NotNull ResourceLocation getId() {
         return id;
     }
@@ -73,34 +88,41 @@ public class MiniFridgeRecipe implements Recipe<Container> {
     }
 
     public static class Serializer implements RecipeSerializer<MiniFridgeRecipe> {
+        public static final MapCodec<MiniFridgeRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                        ResourceLocation.CODEC.optionalFieldOf("id").forGetter(recipe -> Optional.of(recipe.getId())),
+                        Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(MiniFridgeRecipe::getIngredients),
+                        ItemStack.CODEC.fieldOf("result").forGetter(recipe -> recipe.output)
+                ).apply(instance, MiniFridgeRecipe::new)
+        );
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, MiniFridgeRecipe> STREAM_CODEC = StreamCodec.of(MiniFridgeRecipe.Serializer::toNetwork, MiniFridgeRecipe.Serializer::fromNetwork);
+
+
+        public static MiniFridgeRecipe fromNetwork(RegistryFriendlyByteBuf buf) {
+            ResourceLocation id = buf.readResourceLocation();
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+            var children = buf.readCollection(ArrayList::new, buffer -> Ingredient.CONTENTS_STREAM_CODEC.decode(buf));
+            ingredients.addAll(children);
+            final var output = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+
+            return new MiniFridgeRecipe(id, ingredients, output);
+        }
+
+        public static void toNetwork(RegistryFriendlyByteBuf buf, MiniFridgeRecipe recipe) {
+            buf.writeResourceLocation(recipe.getId());
+            buf.writeCollection(recipe.getIngredients(), (b, child) -> Ingredient.CONTENTS_STREAM_CODEC.encode(buf, child));
+            ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, recipe.output);
+        }
+
 
         @Override
-        public @NotNull MiniFridgeRecipe fromJson(ResourceLocation id, JsonObject json) {
-            final var ingredients = GeneralUtil.deserializeIngredients(GsonHelper.getAsJsonArray(json, "ingredients"));
-            if (ingredients.isEmpty()) {
-                throw new JsonParseException("No ingredients for Mini Fridge Recipe");
-            } else if (ingredients.size() > 2) {
-                throw new JsonParseException("Too many ingredients for Mini Fridge Recipe");
-            } else {
-                return new MiniFridgeRecipe(id, ingredients, ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result")));
-            }
+        public @NotNull MapCodec<MiniFridgeRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public @NotNull MiniFridgeRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            final var ingredients  = NonNullList.withSize(buf.readVarInt(), Ingredient.EMPTY);
-            ingredients.replaceAll(ignored -> Ingredient.fromNetwork(buf));
-            return new MiniFridgeRecipe(id, ingredients, buf.readItem());
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, MiniFridgeRecipe recipe) {
-            buf.writeVarInt(recipe.inputs.size());
-            for (Ingredient ingredient : recipe.inputs) {
-                ingredient.toNetwork(buf);
-            }
-
-            buf.writeItem(recipe.output);
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, MiniFridgeRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }
